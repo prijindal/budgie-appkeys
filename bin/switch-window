@@ -1,0 +1,27 @@
+#!/bin/bash
+function launch_or_switch() {
+  xdotool windowactivate `xdotool search --classname --onlyvisible --limit 1 $1`
+  if [ $? -ne 0 ]; then
+      $2 &
+  else
+    xdotool search --classname --onlyvisible $1
+  fi
+}
+
+active=`xdotool getactivewindow`
+if [ $? -ne 1 ]; then
+  string=`xdotool search --classname $1`
+  A=($(echo $string | tr ' ' "\n"))
+
+  FOUND=`echo ${A[*]} | grep "$active"`
+  if [ "${FOUND}" != "" ];then
+  for i in "${A[@]}"
+    do
+      xdotool windowminimize $i
+    done
+  else
+    launch_or_switch $1 $2
+  fi
+else
+  launch_or_switch $1 $2
+fi
